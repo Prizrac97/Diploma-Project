@@ -1,0 +1,19 @@
+# Системные файлы
+.DS_Store
+Thumbs.db
+
+# Логи и кеши
+*.log
+*.cache
+
+# Файлы IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# node_modules (если вдруг используется Node.js)
+node_modules/
+
+# Файлы с настройками операционной системы
+Desktop.ini
