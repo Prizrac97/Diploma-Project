@@ -1,0 +1,11 @@
+version: "3"
+services:
+  web:
+    image: artisans-nook
+    container_name: artisans-nook-container
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+    restart: always
