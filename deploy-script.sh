@@ -7,6 +7,8 @@ cd /home/ubuntu/Diploma-Project || exit
 docker stop artisans-nook-container || true
 docker rm artisans-nook-container || true
 
+git pull origin main
+
 # Сборка нового Docker образа
 docker build -t artisans-nook .
 
