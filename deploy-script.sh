@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Перейти в директорию проекта
-cd /home/ubuntu/Diploma-Project/Artisans-Nook || exit
+cd /home/ubuntu/Diploma-Project || exit
 
 # Остановить старый контейнер (если он существует)
 docker stop artisans-nook-container || true
