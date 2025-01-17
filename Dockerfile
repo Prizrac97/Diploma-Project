@@ -8,7 +8,7 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Копируем файлы сайта
-COPY Artisans-Nook /usr/share/nginx/html
+COPY Artisans-Nook/* /usr/share/nginx/html
 
 # Открываем порты для работы контейнера
 EXPOSE 80
