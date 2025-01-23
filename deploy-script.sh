@@ -1,16 +1,13 @@
 #!/bin/bash
 
-# Перейти в директорию проекта
-cd /home/ubuntu/Diploma-Project || exit
-
-# Остановить старый контейнер (если он существует)
+# Остановить и удалить старый контейнер
 docker stop artisans-nook-container || true
 docker rm artisans-nook-container || true
 
-git pull origin main
 
-# Сборка нового Docker образа
-docker build -t artisans-nook .
+# Скачивать последний образ с DockerHub
+docker pull username/artisans-nook:latest
 
-# Запуск нового контейнера
-docker run -d --name artisans-nook-container -p 80:80 -p 443:443 --restart always -v /etc/letsencrypt:/etc/letsencrypt artisans-nook
+
+# Запустить новый контейнер
+docker run -d --name artisans-nook-container -p 80:80 username/artisans-nook:latest
