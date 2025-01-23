@@ -37,4 +37,5 @@ jobs:
 
     - name: Deploy to server
       run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@56.228.0.252 'bash -s' < deploy-script.sh
+        ssh -o StrictHostKeyChecking=no ubuntu@56.228.0.252 'DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} bash -s' < deploy-script.sh
+

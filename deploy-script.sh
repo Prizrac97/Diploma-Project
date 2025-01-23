@@ -1,13 +1,20 @@
 #!/bin/bash
 
-# Остановить и удалить старый контейнер
+# Остановить и удалить старый контейнер, если он существует
 docker stop artisans-nook-container || true
 docker rm artisans-nook-container || true
 
+# Отладочный вывод для проверки переменной
+echo "Using Docker username: $DOCKER_USERNAME"
 
 # Скачивать последний образ с DockerHub
 docker pull $DOCKER_USERNAME/artisans-nook:latest
 
-
-# Запустить новый контейнер
-docker run -d --name artisans-nook-container -p 80:80 $DOCKER_USERNAME/artisans-nook:latest
+# Запустить новый контейнер с дополнительными параметрами
+docker run -d \
+  --name artisans-nook-container \
+  -p 80:80 \
+  -p 443:443 \
+  --restart always \
+  -v /etc/letsencrypt:/etc/letsencrypt \
+  $DOCKER_USERNAME/artisans-nook:latest
