@@ -6,8 +6,8 @@ docker rm artisans-nook-container || true
 
 
 # Скачивать последний образ с DockerHub
-docker pull username/artisans-nook:latest
+docker pull $DOCKER_USERNAME/artisans-nook:latest
 
 
 # Запустить новый контейнер
-docker run -d --name artisans-nook-container -p 80:80 username/artisans-nook:latest
+docker run -d --name artisans-nook-container -p 80:80 $DOCKER_USERNAME/artisans-nook:latest
