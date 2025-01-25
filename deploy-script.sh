@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Перейти в директорию с проектом
-cd /path/to/your/project || exit
+cd /home/ubuntu/Diploma-Project || exit
 
 # Обновить репозиторий
 git pull origin main
