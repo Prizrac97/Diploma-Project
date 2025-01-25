@@ -3,8 +3,11 @@
 # Перейти в директорию с проектом
 cd /home/ubuntu/Diploma-Project || exit
 
-# Обновить репозиторий
-git pull origin main
+# Обновить проект из репозитория
+echo "Pulling latest changes..."
+git reset --hard  # Сбросить любые локальные изменения
+git clean -fd     # Удалить лишние файлы
+git pull origin main || { echo "Git pull failed! Exiting..."; exit 1; }
 
 # Остановить и удалить старый контейнер, если он существует
 docker stop artisans-nook-container || true
