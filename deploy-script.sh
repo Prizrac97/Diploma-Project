@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Перейти в директорию с проектом
+cd /path/to/your/project || exit
+
+# Обновить репозиторий
+git pull origin main
+
 # Остановить и удалить старый контейнер, если он существует
 docker stop artisans-nook-container || true
 docker rm artisans-nook-container || true
