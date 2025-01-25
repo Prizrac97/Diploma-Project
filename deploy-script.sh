@@ -7,7 +7,7 @@ cd /home/ubuntu/Diploma-Project || exit
 echo "Pulling latest changes..."
 git reset --hard  # Сбросить любые локальные изменения
 git clean -fd     # Удалить лишние файлы
-git pull origin main || { echo "Git pull failed! Exiting..."; exit 1; }
+git pull origin main || exit
 
 # Остановить и удалить старый контейнер, если он существует
 docker stop artisans-nook-container || true
