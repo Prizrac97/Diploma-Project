@@ -28,11 +28,12 @@ docker run -d \
   -v /etc/letsencrypt:/etc/letsencrypt \
   $DOCKER_USERNAME/artisans-nook:latest
 
+# Проверка доступности приложения
 echo "Checking application health..."
 for i in {1..10}; do
   RESPONSE=$(curl -L -s -o /dev/null -w "%{http_code}" https://localhost)
-  
-  if [ $RESPONSE -eq 200 ]; then
+
+  if [ "$RESPONSE" -eq 200 ]; then
     echo "Application is ready!"
     break
   else
@@ -41,7 +42,7 @@ for i in {1..10}; do
   fi
 done
 
-if [ $i -eq 10 ]; then
+if [ "$RESPONSE" -ne 200 ]; then
   echo "Application health check failed!"
   exit 1
 fi

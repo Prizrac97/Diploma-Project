@@ -13,7 +13,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-
     - name: Set up SSH key
       run: |
         mkdir -p ~/.ssh
@@ -22,29 +21,41 @@ jobs:
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
-
     - name: Log in to DockerHub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
 
     - name: Build Docker image
       run: docker build -t ${{ secrets.DOCKER_USERNAME }}/artisans-nook:latest .
 
-
     - name: Push Docker image to DockerHub
       run: docker push ${{ secrets.DOCKER_USERNAME }}/artisans-nook:latest
-
 
     - name: Deploy to server
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@56.228.0.252 'DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} bash -s' < deploy-script.sh
 
+    - name: Wait for server readiness
+      run: |
+        for i in {1..10}; do
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://artisansnook.pp.ua)
+          if [ "$STATUS" -eq 200 ]; then
+            echo "Server is ready for scanning!"
+            break
+          else
+            echo "Attempt $i/10: Server not ready, status: $STATUS"
+            sleep 15
+          fi
+        done
+
+        if [ "$STATUS" -ne 200 ]; then
+          echo "Server did not become ready for scanning!"
+          exit 1
+        fi
 
     - name: OWASP ZAP Scan
       run: |
-        sleep 120
-        
         docker run --rm \
+          --network="host" \
           -v $(pwd):/zap/wrk:rw \
           -t owasp/zap2docker-stable:latest \
           zap-baseline.py \
@@ -52,8 +63,8 @@ jobs:
           -g gen.conf \
           -r zap-report.html \
           -J zap-report.json
-        
-        # Проверяем статус выполнения (2 = критические уязвимости)
+
+        # Проверка статуса выполнения (2 = критические уязвимости)
         if [ $? -eq 2 ]; then
           echo "Critical vulnerabilities found! Failing pipeline..."
           exit 1
