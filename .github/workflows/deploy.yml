@@ -57,7 +57,7 @@ jobs:
         docker run --rm \
           --network="host" \
           -v $(pwd):/zap/wrk:rw \
-          -t owasp/zap2docker-stable:latest \
+          -t ghcr.io/zaproxy/zaproxy:stable \
           zap-baseline.py \
           -t http://artisansnook.pp.ua/ \
           -g gen.conf \
