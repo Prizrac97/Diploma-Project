@@ -52,30 +52,24 @@ jobs:
           exit 1
         fi
 
-    - name: Wait for application
-      run: sleep 120
-
-
     - name: OWASP ZAP Scan
       run: |
-        # Создаем и настраиваем конфигурационный файл
-        echo -e "alert.risk=3\nalert.ignore=10011,10032,10010\nupdate.addons=false\nupdate.check=false" > gen.conf
-        
-        # Меняем владельца файла и даем права на запись
-        sudo chown $USER:$USER gen.conf
-        chmod 666 gen.conf
 
-        docker run --rm \
-          --user $(id -u):$(id -g) \
-          -v "$(pwd):/zap/wrk:rw,z" \
-          -t ghcr.io/zaproxy/zaproxy:stable \
-          zap-baseline.py \
-          -t http://artisansnook.pp.ua/ \
-          -g gen.conf \
-          -r zap-report.html \
-          -J zap-report.json \
-          -d \
-          -I
+        touch gen.conf
+        echo -e "update.addons=false\nupdate.check=false" >> gen.conf
+
+       docker run --rm \
+        --network="host" \
+        -v $(pwd):/zap/wrk:rw,z \
+        -e ZAP_USER="zap" \
+        -t ghcr.io/zaproxy/zaproxy:stable \
+        zap-baseline.py \
+        -t http://artisansnook.pp.ua \
+        -g gen.conf \
+        -r zap-report.html \
+        -J zap-report.json \
+        -d \
+        -I
 
         # Проверка статуса выполнения (2 = критические уязвимости)
         if [ $? -eq 2 ]; then
