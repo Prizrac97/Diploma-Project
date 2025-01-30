@@ -35,7 +35,7 @@ sleep 30
 # Проверка доступности приложения
 echo "Checking application health..."
 for i in {1..10}; do
-  RESPONSE=$(curl -L -s -o /dev/null -w "%{http_code}" http://localhost)
+  RESPONSE=$(curl -k -s -o /dev/null -w "%{http_code}" https://localhost)
 
   if [ "$RESPONSE" -eq 200 ] || [ "$RESPONSE" -eq 301 ]; then
     echo "Application is ready!"

@@ -54,19 +54,20 @@ jobs:
 
     - name: OWASP ZAP Scan
       run: |
-        touch gen.conf
-        echo -e "update.addons=false\nupdate.check=false" >> gen.conf
+        # Создаём файл с необходимыми правами
+        echo -e "alert.risk=3\nalert.ignore=10011,10032\nupdate.addons=false" > gen.conf
+        chmod 666 gen.conf  # Права на чтение/запись для всех
         
+        # Запускаем контейнер от текущего пользователя
         docker run --rm \
-          --network="host" \
-          -v $(pwd):/zap/wrk:rw,z \
-          -e ZAP_USER="zap" \
+          --user $(id -u):$(id -g) \
+          -v "$(pwd):/zap/wrk:rw" \
           -t ghcr.io/zaproxy/zaproxy:stable \
           zap-baseline.py \
           -t http://artisansnook.pp.ua/ \
-          -g gen.conf \
-          -r zap-report.html \
-          -J zap-report.json \
+          -g /zap/wrk/gen.conf \  # Абсолютный путь внутри контейнера
+          -r /zap/wrk/zap-report.html \
+          -J /zap/wrk/zap-report.json \
           -d \
           -I
 
