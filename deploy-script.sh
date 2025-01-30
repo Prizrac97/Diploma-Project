@@ -27,3 +27,20 @@ docker run -d \
   --restart always \
   -v /etc/letsencrypt:/etc/letsencrypt \
   $DOCKER_USERNAME/artisans-nook:latest
+
+echo "Checking application health..."
+for i in {1..10}; do
+  RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost)
+  if [ $RESPONSE -eq 200 ]; then
+    echo "Application is ready!"
+    break
+  else
+    echo "Attempt $i/10 - Got HTTP $RESPONSE, retrying in 15s..."
+    sleep 15
+  fi
+done
+
+if [ $i -eq 10 ]; then
+  echo "Application health check failed!"
+  exit 1
+fi
