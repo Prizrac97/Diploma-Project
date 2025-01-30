@@ -52,26 +52,33 @@ jobs:
           exit 1
         fi
 
+
+    - name: Check website accessibility
+      run: |
+        docker run --rm curlimages/curl -I http://artisansnook.pp.ua
+
+    - name: Wait for ZAP
+      run: sleep 120  # Увеличьте при необходимости
+
     - name: OWASP ZAP Scan
       run: |
-        # Создаём файл с необходимыми правами
+
         echo -e "alert.risk=3\nalert.ignore=10011,10032\nupdate.addons=false" > gen.conf
-        chmod 666 gen.conf  # Права на чтение/запись для всех
-        
-        # Запускаем контейнер от текущего пользователя
+        chmod 666 gen.conf
+
+
         docker run --rm \
-          --user $(id -u):$(id -g) \
           -v "$(pwd):/zap/wrk:rw" \
           -t ghcr.io/zaproxy/zaproxy:stable \
           zap-baseline.py \
           -t http://artisansnook.pp.ua/ \
-          -g /zap/wrk/gen.conf \  # Абсолютный путь внутри контейнера
-          -r /zap/wrk/zap-report.html \
-          -J /zap/wrk/zap-report.json \
+          -g gen.conf \
+          -r zap-report.html \
+          -J zap-report.json \
           -d \
           -I
 
-        # Проверка статуса выполнения (2 = критические уязвимости)
+
         if [ $? -eq 2 ]; then
           echo "Critical vulnerabilities found! Failing pipeline..."
           exit 1
