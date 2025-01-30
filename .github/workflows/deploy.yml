@@ -54,15 +54,22 @@ jobs:
 
     - name: OWASP ZAP Scan
       run: |
+
+        touch gen.conf
+        echo -e "update.addons=false\nupdate.check=false" >> gen.conf
+
         docker run --rm \
           --network="host" \
-          -v $(pwd):/zap/wrk:rw \
+          -v $(pwd):/zap/wrk:rw,z \
+          -e ZAP_USER="zap" \
           -t ghcr.io/zaproxy/zaproxy:stable \
           zap-baseline.py \
           -t http://artisansnook.pp.ua/ \
           -g gen.conf \
           -r zap-report.html \
-          -J zap-report.json
+          -J zap-report.json \
+          -d \
+          -I
 
         # Проверка статуса выполнения (2 = критические уязвимости)
         if [ $? -eq 2 ]; then
