@@ -37,7 +37,7 @@ jobs:
     - name: Wait for server readiness
       run: |
         for i in {1..10}; do
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://artisansnook.pp.ua)
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://artisansnook.pp.ua)
           if [ "$STATUS" -eq 200 ]; then
             echo "Server is ready for scanning!"
             break
@@ -59,7 +59,7 @@ jobs:
           -v $(pwd):/zap/wrk:rw \
           -t owasp/zap2docker-stable:latest \
           zap-baseline.py \
-          -t https://artisansnook.pp.ua/ \
+          -t http://artisansnook.pp.ua/ \
           -g gen.conf \
           -r zap-report.html \
           -J zap-report.json
