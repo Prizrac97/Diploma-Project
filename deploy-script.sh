@@ -30,7 +30,8 @@ docker run -d \
 
 echo "Checking application health..."
 for i in {1..10}; do
-  RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost)
+  RESPONSE=$(curl -L -s -o /dev/null -w "%{http_code}" https://localhost)
+  
   if [ $RESPONSE -eq 200 ]; then
     echo "Application is ready!"
     break
