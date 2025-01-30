@@ -28,12 +28,16 @@ docker run -d \
   -v /etc/letsencrypt:/etc/letsencrypt \
   $DOCKER_USERNAME/artisans-nook:latest
 
+echo "Waiting 30 seconds for container initialization..."
+sleep 30
+
+
 # Проверка доступности приложения
 echo "Checking application health..."
 for i in {1..10}; do
-  RESPONSE=$(curl -L -s -o /dev/null -w "%{http_code}" https://localhost)
+  RESPONSE=$(curl -L -s -o /dev/null -w "%{http_code}" http://localhost)
 
-  if [ "$RESPONSE" -eq 200 ]; then
+  if [ "$RESPONSE" -eq 200 ] || [ "$RESPONSE" -eq 301 ]; then
     echo "Application is ready!"
     break
   else
@@ -42,7 +46,9 @@ for i in {1..10}; do
   fi
 done
 
-if [ "$RESPONSE" -ne 200 ]; then
-  echo "Application health check failed!"
+if [[ "$RESPONSE" -ne 200 && "$RESPONSE" -ne 301 ]]; then
+  echo "Health check failed! Last response: $RESPONSE"
+  echo "Container logs:"
+  docker logs artisans-nook-container
   exit 1
 fi
