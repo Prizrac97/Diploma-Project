@@ -36,7 +36,7 @@ jobs:
 
     - name: OWASP ZAP Passive Scan
       run: |
-        docker run -v $(pwd):/zap/wrk:rw -t owasp/zap2docker-stable zap-baseline.py \
+        docker run -v $(pwd):/zap/wrk:rw -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
           -t https://56.228.0.252 \
           -r zap_report.html
         echo "OWASP ZAP scan completed."
