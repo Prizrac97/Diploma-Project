@@ -37,10 +37,20 @@ jobs:
     - name: Run OWASP ZAP Scan
       run: |
         docker run --user root -v ${{ github.workspace }}:/zap/wrk \
-        ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://artisansnook.pp.ua/
+        ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://artisansnook.pp.ua/ \
+        -r zap_report.html
         echo "OWASP ZAP scan completed."
       env:
         TZ: Europe/Moscow
+
+    - name: Check Report Generation
+      run: |
+        if [ -f zap_report.html ]; then
+          echo "ZAP report successfully generated."
+        else
+          echo "ZAP report not found."
+          exit 1
+        fi
 
     - name: Upload ZAP Report
       uses: actions/upload-artifact@v4
@@ -51,4 +61,4 @@ jobs:
     - name: Display Scan Result
       if: always()
       run: cat zap_report.html
-
+      
