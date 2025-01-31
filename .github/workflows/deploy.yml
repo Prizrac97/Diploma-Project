@@ -39,9 +39,8 @@ jobs:
         docker run --user root -v ${{ github.workspace }}:/zap/wrk \
         ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://artisansnook.pp.ua/ \
         -r zap_report.html
+        --exit-code-threshold 1
         echo "OWASP ZAP scan completed."
-      env:
-        TZ: Europe/Moscow
 
     - name: Check Report Generation
       run: |
@@ -61,4 +60,3 @@ jobs:
     - name: Display Scan Result
       if: always()
       run: cat zap_report.html
-      
