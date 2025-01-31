@@ -37,7 +37,7 @@ jobs:
     - name: Run OWASP ZAP Scan
       run: |
         docker run --user root -v ${{ github.workspace }}:/zap/wrk \
-        ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://example.com
+        ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://artisansnook.pp.ua/
         echo "OWASP ZAP scan completed."
       env:
         TZ: Europe/Moscow
