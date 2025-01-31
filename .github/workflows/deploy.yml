@@ -34,11 +34,10 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@56.228.0.252 'DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} bash -s' < deploy-script.sh
 
-    - name: OWASP ZAP Passive Scan
+    - name: Run OWASP ZAP Scan
       run: |
-        docker run -v $(pwd):/zap/wrk:rw -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
-          -t https://56.228.0.252 \
-          -r zap_report.html
+        docker run --user root -v ${{ github.workspace }}:/zap/wrk \
+        ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t https://example.com
         echo "OWASP ZAP scan completed."
       env:
         TZ: Europe/Moscow
