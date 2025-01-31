@@ -71,22 +71,20 @@ jobs:
 
     - name: OWASP ZAP Scan
       run: |
-
-        echo -e "alert.risk=3\nalert.ignore=10011,10032\nupdate.addons=false\npscan.maxAlertsPerRule=20" > gen.conf
+        echo -e "alert.risk=3\nupdate.addons=false\npscan.maxAlertsPerRule=20" > gen.conf
         chmod 666 gen.conf
-
 
         docker run --rm \
           -v "$(pwd):/zap/wrk:rw" \
           -t ghcr.io/zaproxy/zaproxy:stable \
           zap-baseline.py \
-          -t http://artisansnook.pp.ua/ \
+          -t https://artisansnook.pp.ua/ \
           -g gen.conf \
           -r zap-report.html \
           -J zap-report.json \
           -d \
-          -I
-
+          -I \
+          -m 5
 
         exit_code=$?
         if [ $exit_code -eq 2 ]; then
@@ -96,6 +94,7 @@ jobs:
           echo "ZAP scan exited with code $exit_code. Check reports for details."
           exit $exit_code
         fi
+
 
     - name: Upload ZAP Report
       uses: actions/upload-artifact@v4
