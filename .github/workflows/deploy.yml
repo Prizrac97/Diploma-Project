@@ -34,72 +34,22 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@56.228.0.252 'DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} bash -s' < deploy-script.sh
 
-    - name: Wait for server readiness
+    - name: OWASP ZAP Passive Scan
       run: |
-        for i in {1..20}; do  # Увеличено до 20 попыток
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://artisansnook.pp.ua)
-          if [ "$STATUS" -eq 200 ]; then
-            echo "Server is ready for scanning!"
-            break
-          else
-            echo "Attempt $i/20: Server not ready, status: $STATUS"
-            sleep 20  # Увеличен интервал ожидания
-          fi
-        done
-
-        if [ "$STATUS" -ne 200 ]; then
-          echo "Server did not become ready for scanning!"
-          exit 1
-        fi
-
-
-    - name: Validate website accessibility
-      run: |
-        for i in {1..10}; do
-          if curl -sSf http://artisansnook.pp.ua >/dev/null; then
-            echo "Website is accessible"
-            exit 0
-          fi
-          echo "Attempt $i/10: Website not accessible"
-          sleep 10
-        done
-        echo "Website accessibility check failed"
-        exit 1
-
-    - name: Wait for ZAP
-      run: sleep 120  # Увеличьте при необходимости
-
-    - name: OWASP ZAP Scan
-      run: |
-        echo -e "alert.risk=3\nupdate.addons=false\npscan.maxAlertsPerRule=20" > gen.conf
-        chmod 666 gen.conf
-
-        docker run --rm \
-          -v "$(pwd):/zap/wrk:rw" \
-          -t ghcr.io/zaproxy/zaproxy:stable \
-          zap-baseline.py \
-          -t https://artisansnook.pp.ua/ \
-          -g gen.conf \
-          -r zap-report.html \
-          -J zap-report.json \
-          -d \
-          -I \
-          -m 5
-
-        exit_code=$?
-        if [ $exit_code -eq 2 ]; then
-          echo "Critical vulnerabilities found! Failing pipeline..."
-          exit 1
-        elif [ $exit_code -ne 0 ]; then
-          echo "ZAP scan exited with code $exit_code. Check reports for details."
-          exit $exit_code
-        fi
-
+        docker run -v $(pwd):/zap/wrk:rw -t owasp/zap2docker-stable zap-baseline.py \
+          -t https://56.228.0.252 \
+          -r zap_report.html
+        echo "OWASP ZAP scan completed."
+      env:
+        TZ: Europe/Moscow
 
     - name: Upload ZAP Report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
-        name: zap-security-reports
-        path: |
-          zap-report.html
-          zap-report.json
+        name: zap-report
+        path: zap_report.html
+
+    - name: Display Scan Result
+      if: always()
+      run: cat zap_report.html
+
