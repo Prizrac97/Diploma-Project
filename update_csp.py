@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 def compute_sha256_hash(text):
     digest = hashlib.sha256(text.encode('utf-8')).digest()
     hash_b64 = base64.b64encode(digest).decode('utf-8')
-    return f"sha256-{hash_b64}"
+    return f"'sha256-{hash_b64}'"  # Добавлены одинарные кавычки
 
 def extract_style_hashes_from_file(html_file):
     with open(html_file, "r", encoding="utf-8") as f:
@@ -15,7 +15,7 @@ def extract_style_hashes_from_file(html_file):
     soup = BeautifulSoup(content, "html.parser")
     hashes = set()
     for style in soup.find_all("style"):
-        style_content = style.get_text(strip=True)
+        style_content = style.string  # Используем .string вместо .get_text() для получения точного содержимого
         if style_content:
             hash_value = compute_sha256_hash(style_content)
             hashes.add(hash_value)
@@ -31,7 +31,7 @@ def get_all_html_files(directory):
 
 def update_https_server_block(csp_hashes, nginx_conf_path='nginx.conf'):
     csp_hashes_str = " ".join(sorted(csp_hashes))
-    new_csp_line = f'    add_header Content-Security-Policy "default-src \'self\'; style-src \'self\' {csp_hashes_str};" always;'
+    new_csp_line = f'    add_header Content-Security-Policy "default-src \'self\'; style-src \'self\' {csp_hashes_str}; frame-ancestors \'self\'; form-action \'self\';" always;'
     
     with open(nginx_conf_path, 'r', encoding='utf-8') as f:
         config = f.read()
